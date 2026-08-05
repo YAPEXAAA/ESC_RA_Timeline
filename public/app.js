@@ -195,6 +195,13 @@ function renderBoard(data) {
       <div class="row-bar ${barClass}"></div>
       <div class="row-value">${valueHtml}</div>
     `;
+    
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const tomorrowKey = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    
+    if (day.date === todayKey) row.classList.add('is-today');
+    else if (day.date === tomorrowKey) row.classList.add('is-tomorrow');
+    
     els.boardRows.appendChild(row);
   });
 }
@@ -215,13 +222,6 @@ window.addEventListener('popstate', () => {
   const id = params.get('employee');
   if (id) selectEmployee(id); else showScreen('home');
 });
-
-const today = new Date().toDateString();
-const tomorrow = new Date(Date.now() + 86400000).toDateString();
-
-if (rowDate.toDateString() === today) rowEl.classList.add('is-today');
-else if (rowDate.toDateString() === tomorrow) rowEl.classList.add('is-tomorrow');
-
 // deep link on load
 (() => {
   const params = new URLSearchParams(location.search);
