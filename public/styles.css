@@ -14,6 +14,13 @@
   --violet: #a58bd6;
   --green: #6fbf73;
 
+  /* today / tomorrow highlight — kept distinct from --blue/--violet above
+     (those are already used for "leave" and "other" shift types) */
+  --today: #4e8cff;
+  --today-dim: rgba(78, 140, 255, 0.14);
+  --tomorrow: #9b6bff;
+  --tomorrow-dim: rgba(155, 107, 255, 0.14);
+
   --radius: 5px;
   --font-display: "Barlow Condensed", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
@@ -227,6 +234,8 @@ main.wrap {
 .dot-shift { background: var(--amber); }
 .dot-off { background: var(--slate); }
 .dot-leave { background: var(--blue); }
+.dot-today { background: var(--today); }
+.dot-tomorrow { background: var(--tomorrow); }
 
 /* ---------- board screen ---------- */
 
@@ -328,6 +337,56 @@ main.wrap {
 .row-value .overnight {
   font-size: 10px;
   color: var(--text-faint);
+}
+
+/* ---------- today / tomorrow highlight ---------- */
+/* Applied as a modifier on .board-row, independent of shift type
+   (a "today" row can still be a work shift, a day off, etc). Add the
+   class from JS: row.classList.add('is-today') / 'is-tomorrow'. */
+
+.board-row.is-today,
+.board-row.is-tomorrow {
+  border-width: 1px;
+}
+
+.board-row.is-today {
+  background: var(--today-dim);
+  border-color: rgba(78, 140, 255, 0.35);
+}
+
+.board-row.is-tomorrow {
+  background: var(--tomorrow-dim);
+  border-color: rgba(155, 107, 255, 0.35);
+}
+
+/* the bar always shows today/tomorrow color, overriding shift-type color,
+   so it reads at a glance even before you check the date column */
+.board-row.is-today .row-bar { background: var(--today); }
+.board-row.is-tomorrow .row-bar { background: var(--tomorrow); }
+
+.board-row.is-today .row-day,
+.board-row.is-today .row-date { color: var(--today); }
+.board-row.is-tomorrow .row-day,
+.board-row.is-tomorrow .row-date { color: var(--tomorrow); }
+
+.row-badge {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.row-badge.badge-today {
+  color: var(--today);
+  background: var(--today-dim);
+}
+
+.row-badge.badge-tomorrow {
+  color: var(--tomorrow);
+  background: var(--tomorrow-dim);
 }
 
 .board-empty {
