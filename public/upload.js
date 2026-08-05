@@ -54,7 +54,7 @@ form.addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(data.error || 'Upload failed');
 
     const dates = data.datesAffected.map(formatDate).join(', ');
-    msg.innerHTML = `<div class="upload-msg success">Published. ${data.employeeCount} people on roster now. Dates updated: ${dates}.</div>`;
+    msg.innerHTML = `<div class="upload-msg success">Published. ${data.employeeCount} people on shift now. Dates updated: ${dates}.</div>`;
     form.reset();
     loadHistory(password);
   } catch (err) {
