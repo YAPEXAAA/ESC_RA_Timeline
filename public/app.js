@@ -187,13 +187,22 @@ function renderBoard(data) {
       valueHtml = `<span class="status-label">${escapeHtml(day.in || '')} ${escapeHtml(day.out || '')}</span>`;
     }
 
+    let badgeHtml = '';
+    if (day.date === todayKey) {
+      row.classList.add('is-today');
+      badgeHtml = `<span class="row-badge badge-today">Today</span>`;
+    } else if (day.date === tomorrowKey) {
+      row.classList.add('is-tomorrow');
+      badgeHtml = `<span class="row-badge badge-tomorrow">Tomorrow</span>`;
+    }
+    
     row.innerHTML = `
       <div class="row-date">
         <span class="row-day">${day.dayName}</span>
         <span>${formatDate(day.date)}</span>
       </div>
       <div class="row-bar ${barClass}"></div>
-      <div class="row-value">${valueHtml}</div>
+      <div class="row-value">${valueHtml}${badgeHtml}</div>
     `;
     
     function localDateKey(date) {
