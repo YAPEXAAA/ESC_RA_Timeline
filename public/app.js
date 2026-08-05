@@ -196,8 +196,15 @@ function renderBoard(data) {
       <div class="row-value">${valueHtml}</div>
     `;
     
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const tomorrowKey = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+    function localDateKey(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+    }
+
+    const todayKey = localDateKey(new Date());
+    const tomorrowKey = localDateKey(new Date(Date.now() + 86400000));
     
     if (day.date === todayKey) row.classList.add('is-today');
     else if (day.date === tomorrowKey) row.classList.add('is-tomorrow');
