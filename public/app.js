@@ -216,6 +216,12 @@ window.addEventListener('popstate', () => {
   if (id) selectEmployee(id); else showScreen('home');
 });
 
+const today = new Date().toDateString();
+const tomorrow = new Date(Date.now() + 86400000).toDateString();
+
+if (rowDate.toDateString() === today) rowEl.classList.add('is-today');
+else if (rowDate.toDateString() === tomorrow) rowEl.classList.add('is-tomorrow');
+
 // deep link on load
 (() => {
   const params = new URLSearchParams(location.search);
