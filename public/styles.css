@@ -45,19 +45,6 @@ body {
   padding: 0 24px;
 }
 
-/* faint ambient glow, subject-appropriate: a soft amber wash like a lit board in a dim room */
-.boardglow {
-  position: fixed;
-  top: -20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 900px;
-  height: 500px;
-  background: radial-gradient(ellipse at center, rgba(235, 166, 61, 0.07), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* ---------- topbar ---------- */
 
 .topbar {
@@ -83,14 +70,6 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-.wordmark-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--amber);
-  box-shadow: 0 0 8px rgba(235, 166, 61, 0.7);
 }
 
 .topbar-sub {
