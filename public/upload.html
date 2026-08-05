@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Roster — Upload schedule</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <div class="boardglow" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="/" class="wordmark"><span class="wordmark-dot"></span>ROSTER</a>
+      <span class="topbar-sub">Upload</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="screen">
+      <h1 class="hero-title">Upload a schedule.</h1>
+      <p class="hero-sub">Dates already on file get replaced entirely by whatever's in the new file — no leftover conflicts.</p>
+
+      <div class="upload-panel">
+        <form id="upload-form">
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" required />
+          </div>
+          <div class="field">
+            <label for="file">Schedule file (.xlsx)</label>
+            <input type="file" id="file" name="file" accept=".xlsx,.xlsm" required />
+            <span class="field-hint">Max 3MB.</span>
+          </div>
+          <button type="submit" class="btn-primary" id="submit-btn">Upload &amp; publish</button>
+        </form>
+        <div id="msg"></div>
+      </div>
+
+      <div class="upload-history" id="history" hidden>
+        <h3>Recent uploads</h3>
+        <div id="history-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>This page isn't linked from search — keep the URL to yourself.</span>
+      <a href="/">← Back to search</a>
+    </div>
+  </footer>
+
+  <script src="/upload.js"></script>
+</body>
+</html>

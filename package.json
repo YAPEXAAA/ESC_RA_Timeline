@@ -1,0 +1,13 @@
+{
+  "name": "roster",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Upload a shift schedule spreadsheet, everyone searches their name to see when they work.",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0",
+    "xlsx": "^0.18.5"
+  }
+}
