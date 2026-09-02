@@ -19,7 +19,8 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { filename, fileBase64 } = req.body || {};
+  const { filename, fileBase64, mode } = req.body || {};
+  const isDraft = mode === 'draft';
   if (!filename || !fileBase64) {
     res.status(400).json({ error: 'No file uploaded' });
     return;
@@ -44,9 +45,23 @@ module.exports = async (req, res) => {
 
   try {
     const parsed = parseWorkbook(buffer);
+
+    if (isDraft) {
+      const state = await store.saveDraftUpload(parsed, filename);
+      res.status(200).json({
+        ok: true,
+        mode: 'draft',
+        sheetsParsed: parsed.sheetsParsed,
+        datesAffected: parsed.datesFound,
+        employeeCount: Object.keys(state.employees).length,
+      });
+      return;
+    }
+
     const state = await store.mergeUpload(parsed, filename);
     res.status(200).json({
       ok: true,
+      mode: 'final',
       sheetsParsed: parsed.sheetsParsed,
       datesAffected: parsed.datesFound,
       employeeCount: Object.keys(state.employees).length,

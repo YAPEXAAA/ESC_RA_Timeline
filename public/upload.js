@@ -47,7 +47,11 @@ form.addEventListener('submit', async (e) => {
         'Content-Type': 'application/json',
         'x-upload-password': password,
       },
-      body: JSON.stringify({ filename: file.name, fileBase64 }),
+      body: JSON.stringify({
+        filename: file.name,
+        fileBase64,
+        mode: document.querySelector('input[name="mode"]:checked').value,
+      }),
     });
     const data = await res.json();
 

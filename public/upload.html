@@ -37,6 +37,12 @@
             <input type="file" id="file" name="file" accept=".xlsx,.xlsm" required />
             <span class="field-hint">Max 3MB.</span>
           </div>
+          <div class="field">
+            <label>Upload type</label>
+            <label><input type="radio" name="mode" value="final" checked /> Final</label>
+            <label><input type="radio" name="mode" value="draft" /> Draft</label>
+            <span class="field-hint">Draft is stored separately and only ever keeps the latest week — it doesn't touch the published schedule.</span>
+          </div>
           <button type="submit" class="btn-primary" id="submit-btn">Upload &amp; publish</button>
         </form>
         <div id="msg"></div>
