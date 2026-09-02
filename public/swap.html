@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ESC_RA Timeline — Swap</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="/" class="wordmark"><span class="wordmark-dot"></span>ESC_RA Timeline</a>
+
+      <nav class="navlinks" id="navlinks">
+        <a href="/index.html" class="navlink">Final</a>
+        <a href="/draft.html" class="navlink">Draft</a>
+        <a href="/swap.html" class="navlink">Swap</a>
+        <a href="/profile.html" class="navlink">Profile</a>
+      </nav>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===== NO DRAFT ===== -->
+    <section id="screen-empty" class="screen" hidden>
+      <h1 class="hero-title">No draft on file.</h1>
+      <p class="hero-sub">Upload a draft week first — swaps are computed against it.</p>
+    </section>
+
+    <!-- ===== PICK AN AGENT ===== -->
+    <section id="screen-pick" class="screen" hidden>
+      <h1 class="hero-title">Find a swap.</h1>
+      <p class="hero-sub">Pick an agent to see who they can trade their whole draft week with.</p>
+      <p class="swap-week-note" id="week-range"></p>
+
+      <div class="searchbox">
+        <svg class="searchbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="pick-input" type="text" placeholder="Start typing a name…" autocomplete="off" spellcheck="false" />
+        <div id="pick-suggestions" class="suggestions" hidden></div>
+      </div>
+    </section>
+
+    <!-- ===== PARTNER LIST FOR CHOSEN AGENT ===== -->
+    <section id="screen-partners" class="screen" hidden>
+      <button class="back-btn" id="back-to-pick">← Choose a different agent</button>
+
+      <div class="board-header">
+        <h2 id="agent-name">—</h2>
+        <span id="agent-skill" class="board-skill">—</span>
+      </div>
+
+      <p id="agent-excluded" class="excluded-note" hidden></p>
+
+      <div id="agent-week" class="board-rows"></div>
+
+      <h3 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin:28px 0 4px;">Can legally swap weeks with</h3>
+      <div id="partner-list" class="partner-list"></div>
+      <p id="partner-empty" class="partner-empty" hidden>No one else's draft week can be swapped with this agent's without breaking the 7-day or 12h-rest rules.</p>
+    </section>
+
+    <!-- ===== SIDE-BY-SIDE COMPARISON ===== -->
+    <section id="screen-compare" class="screen" hidden>
+      <button class="back-btn" id="back-to-partners">← Back to partner list</button>
+
+      <div class="compare-grid">
+        <div class="compare-col">
+          <h3 id="compare-name-a">—</h3>
+          <span class="board-skill" id="compare-skill-a">—</span>
+          <div id="compare-week-a" class="board-rows"></div>
+        </div>
+        <div class="compare-col">
+          <h3 id="compare-name-b">—</h3>
+          <span class="board-skill" id="compare-skill-b">—</span>
+          <div id="compare-week-b" class="board-rows"></div>
+        </div>
+      </div>
+
+      <p class="swap-verdict">✓ This swap keeps both agents under 7 consecutive working days and 12h+ rest between shifts.</p>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Powered by 7355608 Spreadsheets</span>
+      <a href="/upload.html">Upload a schedule →</a>
+    </div>
+  </footer>
+
+  <script src="/swap.js"></script>
+</body>
+</html>
