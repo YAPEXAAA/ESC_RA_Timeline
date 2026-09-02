@@ -84,3 +84,28 @@ async function loadHistory(password) {
     historyBox.hidden = false;
   } catch (e) { /* quiet */ }
 }
+
+// ---------- animated navbar ----------
+(() => {
+  const toggle = document.getElementById('nav-toggle');
+  const links = document.getElementById('navlinks');
+  if (!toggle || !links) return;
+
+  toggle.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  // mark current page active + close menu on link tap (mobile)
+  const here = location.pathname.replace(/\/$/, '') || '/';
+  document.querySelectorAll('.navlink').forEach((a) => {
+    const path = new URL(a.href).pathname.replace(/\/$/, '') || '/';
+    if (path === here) a.classList.add('active');
+    a.addEventListener('click', () => {
+      links.classList.remove('open');
+      toggle.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
