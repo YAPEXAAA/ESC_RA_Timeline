@@ -6,18 +6,25 @@ module.exports = async (req, res) => {
     return;
   }
 
+  res.setHeader('Cache-Control', 'no-store');
+
+  const q = (req.query.q || '').trim().toLowerCase();
+  if (!q) {
+    res.status(200).json([]);
+    return;
+  }
+
   try {
     const state = await store.load();
-    const dates = Object.keys(state.schedule).sort();
-    res.status(200).json({
-      employeeCount: Object.keys(state.employees).length,
-      dateCount: dates.length,
-      firstDate: dates[0] || null,
-      lastDate: dates[dates.length - 1] || null,
-      lastUpload: state.meta.lastUpload,
-    });
+    const results = Object.values(state.employees)
+      .filter((e) => e.name.toLowerCase().includes(q))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 20)
+      .map((e) => ({ id: e.id, name: e.name, skill: e.skill }));
+
+    res.status(200).json(results);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to load schedule data' });
+    res.status(500).json({ error: 'Search failed' });
   }
 };
