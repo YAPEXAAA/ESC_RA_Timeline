@@ -3,8 +3,8 @@ const STORAGE_KEY = 'esc_ra_employee_id';
 const els = {
   setup: document.getElementById('screen-setup'),
   board: document.getElementById('screen-board'),
-  setupInput: document.getElementById('setup-input'),
-  setupSuggestions: document.getElementById('setup-suggestions'),
+  searchInput: document.getElementById('search-input'),
+  suggestions: document.getElementById('suggestions'),
   logoutBtn: document.getElementById('logout-btn'),
   boardName: document.getElementById('board-name'),
   boardSkill: document.getElementById('board-skill'),
