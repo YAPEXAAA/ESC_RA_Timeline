@@ -4,7 +4,7 @@ const els = {
   setup: document.getElementById('screen-setup'),
   board: document.getElementById('screen-board'),
   searchInput: document.getElementById('search-input'),
-  suggestions: document.getElementById('suggestions'),
+  suggestionsEl: document.getElementById('suggestions'),
   logoutBtn: document.getElementById('logout-btn'),
   boardName: document.getElementById('board-name'),
   boardSkill: document.getElementById('board-skill'),
@@ -113,16 +113,16 @@ let debounceTimer;
 let activeIndex = -1;
 let currentResults = [];
 
-els.setupInput.addEventListener('input', () => {
+els.searchInput.addEventListener('input', () => {
   clearTimeout(debounceTimer);
-  const q = els.setupInput.value.trim();
+  const q = els.searchInput.value.trim();
   if (!q) { hideSuggestions(); return; }
   debounceTimer = setTimeout(() => runSearch(q), 150);
 });
 
-els.setupInput.addEventListener('keydown', (e) => {
-  if (els.setupSuggestions.hidden) return;
-  const items = [...els.setupSuggestions.querySelectorAll('.suggestion')];
+els.searchInput.addEventListener('keydown', (e) => {
+  if (els.suggestionsEl.hidden) return;
+  const items = [...els.suggestionsEl.querySelectorAll('.suggestion')];
   if (e.key === 'ArrowDown') {
     e.preventDefault();
     activeIndex = Math.min(activeIndex + 1, items.length - 1);
@@ -158,10 +158,10 @@ async function runSearch(q) {
 }
 
 function renderSuggestions(results) {
-  els.setupSuggestions.innerHTML = '';
+  els.suggestionsEl.innerHTML = '';
   if (results.length === 0) {
-    els.setupSuggestions.innerHTML = `<div class="suggestion-empty">No one matches that name yet</div>`;
-    els.setupSuggestions.hidden = false;
+    els.suggestionsEl.innerHTML = `<div class="suggestion-empty">No one matches that name yet</div>`;
+    els.suggestionsEl.hidden = false;
     return;
   }
   for (const emp of results) {
@@ -169,14 +169,14 @@ function renderSuggestions(results) {
     row.className = 'suggestion';
     row.innerHTML = `<span class="suggestion-name">${escapeHtml(emp.name)}</span><span class="suggestion-skill">${escapeHtml(emp.skill || '')}</span>`;
     row.addEventListener('click', () => saveAndLoad(emp.id));
-    els.setupSuggestions.appendChild(row);
+    els.suggestionsEl.appendChild(row);
   }
-  els.setupSuggestions.hidden = false;
+  els.suggestionsEl.hidden = false;
 }
 
 function hideSuggestions() {
-  els.setupSuggestions.hidden = true;
-  els.setupSuggestions.innerHTML = '';
+  els.suggestionsEl.hidden = true;
+  els.suggestionsEl.innerHTML = '';
   activeIndex = -1;
 }
 
@@ -187,7 +187,7 @@ document.addEventListener('click', (e) => {
 function saveAndLoad(id) {
   localStorage.setItem(STORAGE_KEY, id);
   hideSuggestions();
-  els.setupInput.value = '';
+  els.searchInput.value = '';
   loadSavedProfile(id);
 }
 
