@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ESC_RA Timeline — Profile</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="/" class="wordmark"><span class="wordmark-dot"></span>ESC_RA Timeline</a>
+
+      <nav class="navlinks" id="navlinks">
+        <a href="/index.html" class="navlink">Final</a>
+        <a href="/draft.html" class="navlink">Draft</a>
+        <a href="/swap.html" class="navlink">Swap</a>
+        <a href="/profile.html" class="navlink">Profile</a>
+      </nav>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===== SETUP SCREEN (no saved name yet) ===== -->
+    <section id="screen-setup" class="screen" hidden>
+      <h1 class="hero-title">Set up your profile.</h1>
+      <p class="hero-sub">Save your name once — this page will remember you and jump straight to your schedule.</p>
+
+      <div class="searchbox">
+        <svg class="searchbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="setup-input" type="text" placeholder="Start typing your name…" autocomplete="off" spellcheck="false" />
+        <div id="setup-suggestions" class="suggestions" hidden></div>
+      </div>
+      <p class="search-hint">Pick yourself from the list — this device will stay signed in as you.</p>
+    </section>
+
+    <!-- ===== EMPLOYEE BOARD SCREEN (saved name found) ===== -->
+    <section id="screen-board" class="screen" hidden>
+      <div class="board-header">
+        <h2 id="board-name">—</h2>
+        <span id="board-skill" class="board-skill">—</span>
+      </div>
+
+      <div class="legend">
+        <span class="legend-item"><i class="dot dot-shift"></i>Working shift</span>
+        <span class="legend-item"><i class="dot dot-off"></i>Day off (R)</span>
+        <span class="legend-item"><i class="dot dot-leave"></i>Paid leave (CP)</span>
+        <span class="legend-item"><i class="dot dot-today"></i>Today</span>
+        <span class="legend-item"><i class="dot dot-tomorrow"></i>Tomorrow</span>
+      </div>
+
+      <div id="board-rows" class="board-rows"></div>
+      <p id="board-empty" class="board-empty" hidden>No schedule on file for this person yet.</p>
+
+      <button class="back-btn" id="logout-btn">Log out (forget me on this device)</button>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Powered by 7355608 Spreadsheets</span>
+      <a href="/upload.html">Upload a schedule →</a>
+    </div>
+  </footer>
+
+  <script src="/profile.js"></script>
+</body>
+</html>
