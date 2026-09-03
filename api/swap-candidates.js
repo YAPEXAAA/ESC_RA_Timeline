@@ -109,7 +109,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    const employees = empIds.map((id) => ({
+    let employees = empIds.map((id) => ({
       id,
       name: draft.employees[id].name,
       skill: draft.employees[id].skill,
@@ -118,7 +118,25 @@ module.exports = async (req, res) => {
       week: weekOf(id),
     }));
 
-    res.status(200).json({ draftDates, employees, pairs });
+    // If empId provided, filter to just that user and their partners
+    const requestedEmpId = req.query.empId;
+    let filteredPairs = pairs;
+    if (requestedEmpId) {
+      if (!draft.employees[requestedEmpId]) {
+        return res.status(404).json({ error: 'Employee not found in draft' });
+      }
+      // Only include the requested employee + their valid partners
+      const partnersOfRequested = new Set();
+      for (const [a, b] of pairs) {
+        if (a === requestedEmpId) partnersOfRequested.add(b);
+        if (b === requestedEmpId) partnersOfRequested.add(a);
+      }
+      const idsToInclude = new Set([requestedEmpId, ...partnersOfRequested]);
+      employees = employees.filter((e) => idsToInclude.has(e.id));
+      filteredPairs = pairs.filter((p) => idsToInclude.has(p[0]) && idsToInclude.has(p[1]));
+    }
+
+    res.status(200).json({ draftDates, employees, pairs: filteredPairs });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to compute swap candidates' });

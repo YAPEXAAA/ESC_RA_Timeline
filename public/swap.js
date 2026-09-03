@@ -202,11 +202,30 @@ els.backToPartners.addEventListener('click', () => showScreen('partners'));
 
 // ---------- load ----------
 async function init() {
+  // Get current user from localStorage
+  const currentEmpId = localStorage.getItem('esc_ra_employee_id');
+  
+  if (!currentEmpId) {
+    els.empty.innerHTML = `
+      <h1 class="hero-title">Not logged in.</h1>
+      <p class="hero-sub">Please go to <a href="/profile.html">Profile</a> and select your name first.</p>
+    `;
+    showScreen('empty');
+    return;
+  }
+
   try {
-    const res = await fetch('/api/swap-candidates');
+    const res = await fetch(`/api/swap-candidates?empId=${encodeURIComponent(currentEmpId)}`);
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
     DATA = await res.json();
   } catch (e) {
-    DATA = { draftDates: [], employees: [], pairs: [] };
+    console.error('Failed to load swap candidates:', e);
+    els.empty.innerHTML = `
+      <h1 class="hero-title">Error loading swap data.</h1>
+      <p class="hero-sub">${escapeHtml(e.message)}</p>
+    `;
+    showScreen('empty');
+    return;
   }
 
   if (!DATA.draftDates || DATA.draftDates.length === 0) {
@@ -228,6 +247,11 @@ async function init() {
   els.weekRange.textContent = `Draft week: ${formatDate(first)} – ${formatDate(last)}`;
 
   showScreen('pick');
+  
+  // Auto-load current user if they're in the data
+  if (byId[currentEmpId]) {
+    selectAgent(currentEmpId);
+  }
 }
 init();
 
