@@ -8,23 +8,19 @@ module.exports = async (req, res) => {
 
   res.setHeader('Cache-Control', 'no-store');
 
-  const q = (req.query.q || '').trim().toLowerCase();
-  if (!q) {
-    res.status(200).json([]);
-    return;
-  }
-
   try {
     const state = await store.load();
-    const results = Object.values(state.employees)
-      .filter((e) => e.name.toLowerCase().includes(q))
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .slice(0, 20)
-      .map((e) => ({ id: e.id, name: e.name, skill: e.skill }));
+    const employeeCount = Object.keys(state.employees).length;
+    const dateKeys = Object.keys(state.schedule).sort();
 
-    res.status(200).json(results);
+    res.status(200).json({
+      employeeCount,
+      firstDate: dateKeys[0] || null,
+      lastDate: dateKeys[dateKeys.length - 1] || null,
+      lastUpload: state.meta?.lastUpload || null,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Search failed' });
+    res.status(500).json({ error: 'Failed to load stats' });
   }
 };

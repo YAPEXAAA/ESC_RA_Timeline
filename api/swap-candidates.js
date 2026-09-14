@@ -89,54 +89,71 @@ module.exports = async (req, res) => {
       ...((draft.schedule[date] && draft.schedule[date][empId]) || { type: 'status', code: 'OFF', label: 'No shift' }),
     }));
 
-    const pairs = [];
-    for (let i = 0; i < eligible.length; i++) {
-      for (let j = i + 1; j < eligible.length; j++) {
-        const a = eligible[i];
-        const b = eligible[j];
-
-        // hypothetical schedule with A's and B's entire draft weeks swapped
-        const swapped = {};
-        for (const date of draftDates) {
-          const day = draft.schedule[date] || {};
-          swapped[date] = { ...day, [a]: day[b] || null, [b]: day[a] || null };
-        }
-
-        const timelineA = [...buildTimeline(priorDates, final.schedule, a), ...buildTimeline(draftDates, swapped, a)];
-        const timelineB = [...buildTimeline(priorDates, final.schedule, b), ...buildTimeline(draftDates, swapped, b)];
-
-        if (isTimelineValid(timelineA) && isTimelineValid(timelineB)) pairs.push([a, b]);
+    function isValidSwap(a, b) {
+      // hypothetical schedule with A's and B's entire draft weeks swapped
+      const swapped = {};
+      for (const date of draftDates) {
+        const day = draft.schedule[date] || {};
+        swapped[date] = { ...day, [a]: day[b] || null, [b]: day[a] || null };
       }
+
+      const timelineA = [...buildTimeline(priorDates, final.schedule, a), ...buildTimeline(draftDates, swapped, a)];
+      const timelineB = [...buildTimeline(priorDates, final.schedule, b), ...buildTimeline(draftDates, swapped, b)];
+
+      return isTimelineValid(timelineA) && isTimelineValid(timelineB);
     }
 
-    let employees = empIds.map((id) => ({
-      id,
-      name: draft.employees[id].name,
-      skill: draft.employees[id].skill,
-      excluded: cpSet.has(id),
-      excludeReason: cpSet.has(id) ? 'Has paid leave (CP) this week' : null,
-      week: weekOf(id),
-    }));
-
-    // If empId provided, filter to just that user and their partners
+    // If a specific employee is requested, only check that one person against
+    // everyone else (O(n)) instead of every possible pair (O(n^2)) — the
+    // full matrix was the source of the multi-second load on every visit,
+    // since the page always asks for the current user's candidates only.
     const requestedEmpId = req.query.empId;
-    let filteredPairs = pairs;
+
+    let pairs = [];
+    let employees;
+
     if (requestedEmpId) {
       if (!draft.employees[requestedEmpId]) {
         return res.status(404).json({ error: 'Employee not found in draft' });
       }
-      // Only include the requested employee + their valid partners
-      const partnersOfRequested = new Set();
-      for (const [a, b] of pairs) {
-        if (a === requestedEmpId) partnersOfRequested.add(b);
-        if (b === requestedEmpId) partnersOfRequested.add(a);
+
+      const idsToInclude = new Set([requestedEmpId]);
+      if (eligible.includes(requestedEmpId)) {
+        for (const otherId of eligible) {
+          if (otherId === requestedEmpId) continue;
+          if (isValidSwap(requestedEmpId, otherId)) {
+            pairs.push([requestedEmpId, otherId]);
+            idsToInclude.add(otherId);
+          }
+        }
       }
-      const idsToInclude = new Set([requestedEmpId, ...partnersOfRequested]);
-      employees = employees.filter((e) => idsToInclude.has(e.id));
-      filteredPairs = pairs.filter((p) => idsToInclude.has(p[0]) && idsToInclude.has(p[1]));
+
+      employees = [...idsToInclude].map((id) => ({
+        id,
+        name: draft.employees[id].name,
+        skill: draft.employees[id].skill,
+        excluded: cpSet.has(id),
+        excludeReason: cpSet.has(id) ? 'Has paid leave (CP) this week' : null,
+        week: weekOf(id),
+      }));
+    } else {
+      for (let i = 0; i < eligible.length; i++) {
+        for (let j = i + 1; j < eligible.length; j++) {
+          if (isValidSwap(eligible[i], eligible[j])) pairs.push([eligible[i], eligible[j]]);
+        }
+      }
+
+      employees = empIds.map((id) => ({
+        id,
+        name: draft.employees[id].name,
+        skill: draft.employees[id].skill,
+        excluded: cpSet.has(id),
+        excludeReason: cpSet.has(id) ? 'Has paid leave (CP) this week' : null,
+        week: weekOf(id),
+      }));
     }
 
-    res.status(200).json({ draftDates, employees, pairs: filteredPairs });
+    res.status(200).json({ draftDates, employees, pairs });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to compute swap candidates' });
