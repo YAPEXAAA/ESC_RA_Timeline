@@ -22,6 +22,15 @@ function buildTimeline(dateKeys, scheduleByDate, empId) {
   return dateKeys.map((date) => ({ date, entry: (scheduleByDate[date] || {})[empId] || null }));
 }
 
+// A missing record must never be silently read as "day off" — that would
+// undercount consecutive working days across the prior-week/draft-week
+// boundary. If we don't have a real entry for every one of the 7 lookback
+// days, we don't know this person's actual run length, so the swap can't
+// be certified.
+function hasFullCoverage(timeline) {
+  return timeline.every(({ entry }) => entry != null);
+}
+
 // Enforces: no more than 7 consecutive working days, and at least 12h
 // between the end of one shift and the start of the next.
 function isTimelineValid(timeline) {
@@ -97,8 +106,18 @@ module.exports = async (req, res) => {
         swapped[date] = { ...day, [a]: day[b] || null, [b]: day[a] || null };
       }
 
-      const timelineA = [...buildTimeline(priorDates, final.schedule, a), ...buildTimeline(draftDates, swapped, a)];
-      const timelineB = [...buildTimeline(priorDates, final.schedule, b), ...buildTimeline(draftDates, swapped, b)];
+      const priorA = buildTimeline(priorDates, final.schedule, a);
+      const priorB = buildTimeline(priorDates, final.schedule, b);
+
+      // Without a recorded prior week for both people, we can't rule out
+      // exactly the case a real scheduler cares about most: someone's days
+      // off landing at the start of one week and the end of the other,
+      // stitching together a run of 8+ working days. Refuse to vouch for
+      // the swap rather than guess.
+      if (!hasFullCoverage(priorA) || !hasFullCoverage(priorB)) return false;
+
+      const timelineA = [...priorA, ...buildTimeline(draftDates, swapped, a)];
+      const timelineB = [...priorB, ...buildTimeline(draftDates, swapped, b)];
 
       return isTimelineValid(timelineA) && isTimelineValid(timelineB);
     }
