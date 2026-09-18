@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/date";
 import { fetchJson } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "esc_ra_employee_id";
 
@@ -14,7 +15,7 @@ export default function Swap() {
   const [errorMsg, setErrorMsg] = useState("");
   const [data, setData] = useState({ draftDates: [], employees: [], pairs: [] });
   const [agentId, setAgentId] = useState(null);
-  const [compareIds, setCompareIds] = useState(null); // [idA, idB]
+  const [expandedPartnerId, setExpandedPartnerId] = useState(null);
 
   const byId = useMemo(() => {
     const map = {};
@@ -59,14 +60,13 @@ export default function Swap() {
 
   function selectAgent(id) {
     setAgentId(id);
+    setExpandedPartnerId(null);
     setStatus("partners");
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   }
 
-  function selectCompare(idA, idB) {
-    setCompareIds([idA, idB]);
-    setStatus("compare");
-    window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+  function togglePartner(pid) {
+    setExpandedPartnerId((prev) => (prev === pid ? null : pid));
   }
 
   async function fetchAgentResults(q) {
@@ -120,35 +120,6 @@ export default function Swap() {
     );
   }
 
-  if (status === "compare" && compareIds) {
-    const a = byId[compareIds[0]];
-    const b = byId[compareIds[1]];
-    return (
-      <section className="screen" id="screen-compare">
-        <Button variant="link" className="mb-6 font-mono text-[13px] text-[var(--text-faint)] hover:text-muted-foreground" onClick={() => setStatus("partners")}>
-          ← Back to partner list
-        </Button>
-
-        <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <h3 className="mb-1 font-display text-xl font-semibold text-foreground">{a.name}</h3>
-            <Badge variant="outline" className="mb-3.5 inline-block">{a.skill || ""}</Badge>
-            <BoardRows days={a.week} highlightTodayTomorrow={false} staggerMs={30} />
-          </div>
-          <div>
-            <h3 className="mb-1 font-display text-xl font-semibold text-foreground">{b.name}</h3>
-            <Badge variant="outline" className="mb-3.5 inline-block">{b.skill || ""}</Badge>
-            <BoardRows days={b.week} highlightTodayTomorrow={false} staggerMs={30} />
-          </div>
-        </div>
-
-        <p className="mt-7 rounded-[var(--radius)] border border-border bg-[var(--success-bg)] px-4 py-3.5 text-[13px] text-[var(--green)]">
-          ✓ This swap keeps both agents under 7 consecutive working days and 12h+ rest between shifts.
-        </p>
-      </section>
-    );
-  }
-
   if (status === "partners" && agentId) {
     const emp = byId[agentId];
     if (!emp) return null;
@@ -192,14 +163,48 @@ export default function Swap() {
               <div className="mt-4 flex flex-col gap-2">
                 {partnerIds.map((pid) => {
                   const p = byId[pid];
+                  const isOpen = expandedPartnerId === pid;
                   return (
                     <div
                       key={pid}
-                      className="flex cursor-pointer items-center justify-between rounded-[var(--radius)] border border-border bg-card px-4 py-3 text-sm transition-colors hover:border-[var(--accent-dim)] hover:bg-[var(--panel-hover)]"
-                      onClick={() => selectCompare(agentId, pid)}
+                      className={cn(
+                        "overflow-hidden rounded-[var(--radius)] border bg-card transition-colors",
+                        isOpen ? "border-[var(--accent-dim)]" : "border-border"
+                      )}
                     >
-                      <span className="text-foreground">{p.name}</span>
-                      <span className="text-[11px] uppercase tracking-[0.05em] text-[var(--text-faint)]">{p.skill || ""}</span>
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-[var(--panel-hover)]"
+                        onClick={() => togglePartner(pid)}
+                      >
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            className="inline-block shrink-0 text-[10px] text-[var(--text-faint)] transition-transform duration-300 ease-in-out"
+                            style={{ transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                          >
+                            ▸
+                          </span>
+                          <span className="truncate text-foreground">{p.name}</span>
+                        </span>
+                        <span className="shrink-0 text-[11px] uppercase tracking-[0.05em] text-[var(--text-faint)]">
+                          {p.skill || ""}
+                        </span>
+                      </button>
+
+                      <div
+                        className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+                        style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+                      >
+                        <div className="min-h-0 overflow-hidden">
+                          <div className="border-t border-border px-4 py-4">
+                            <BoardRows days={p.week} highlightTodayTomorrow={false} staggerMs={isOpen ? 25 : 0} />
+                            <p className="mt-4 rounded-[var(--radius)] border border-border bg-[var(--success-bg)] px-3.5 py-3 text-[12px] text-[var(--green)]">
+                              ✓ This swap keeps both agents under 7 consecutive working days and 12h+ rest between shifts.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
